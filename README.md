@@ -3,7 +3,7 @@
 - 소설 작가 페르소나를 위한 Qwen3-8B 기반 LoRA/QLoRA 파인튜닝 코드입니다.
 ---
 ### 폴더 구성
-
+```bash
 ai/novelist/
 ├── train_qlora.py                # 4bit NF4 QLoRA 학습 코드
 ├── train_lora_bf16.py            # 최종 bf16 LoRA 학습 코드
@@ -12,6 +12,7 @@ ai/novelist/
 ├── calculate_dataset_stats.py    # 평균 프롬프트/답변 토큰 길이 계산 코드
 ├── requirements.txt              # pip 환경 패키지 목록
 └── README.md                     # conda 환경 설정 파일
+```
 
 >   ※ train_qlora.py
 >    - 4bit NF4 양자화 적용
@@ -56,14 +57,17 @@ ai/novelist/
 ```bash
 conda env create -f environment.yml
 conda activate qwen_sh
+```
 
 2. 또는 pip로 직접 설치
 - PyTorch는 CUDA 버전에 맞춰 먼저 설치합니다.
 ```bash
 pip install torch==2.5.1 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+```
 - 이후 필요한 패키지를 설치합니다.
 ```bash
 pip install -r requirements.txt
+```
 
 ---
 ### 주의사항
