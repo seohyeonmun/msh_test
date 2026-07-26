@@ -209,13 +209,116 @@ FinePrint의 주요 검증 경로가 의도한 대로 동작하는지 확인하�
 ---
 ## 12. 실행 방법
 
+### 1) 환경 설정
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+python -m pip install -r requirements.txt
+python -m playwright install chromium
+
+Copy-Item .env.example .env
+```
+
+프로젝트 루트의 `.env` 파일에 API 키를 설정합니다.
+
+```env
+OPENAI_API_KEY=your_openai_api_key
+TAVILY_API_KEY=your_tavily_api_key
+```
+
+> `OPENAI_API_KEY`: Agent 답변 생성 및 검증에 필요  
+> `TAVILY_API_KEY`: 등록되지 않은 서비스의 공식 약관 URL 자동 탐색 시 필요
+
+### 2) FastAPI 서버 실행
+
+```powershell
+uvicorn api:app --host 0.0.0.0 --port 8000 --reload
+```
+
+- Python API 기본 주소: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+
+### 3) React UI 실행
+
+새 터미널에서 다음 명령을 실행합니다.
+
+```powershell
+Set-Location frontend
+Copy-Item .env.example .env
+
+npm install
+npm run dev
+```
+
+- React UI 기본 접속 주소: [http://localhost:3000](http://localhost:3000)
+
+> Python API를 먼저 실행한 뒤 React UI를 실행해야 합니다.
+
+### 4) 서비스 이용 흐름
+
+1. 서비스명 입력
+2. 기존 지식 DB에서 해당 서비스 문서 확인
+3. 문서가 없으면 공식 URL 자동 탐색 및 수집
+4. 자동 수집이 어려운 경우 URL 또는 PDF·TXT 직접 입력
+5. 문제 상황 입력
+6. Hybrid RAG 검색 및 검증 Agent 실행
+7. 근거, 확인사항, 다음 행동 확인
+
+#### 주요 API
+
+| Method | Endpoint | 기능 |
+|---|---|---|
+| `POST` | `/services/prepare` | DB 확인 후 서비스 문서 자동 수집 및 인제스트 |
+| `POST` | `/services/url` | 사용자가 입력한 공식 URL 수집 및 인제스트 |
+| `POST` | `/services/document` | PDF·TXT 문서 업로드 및 인제스트 |
+| `POST` | `/questions` | Hybrid RAG 검색과 검증 Agent 실행 |
+
+#### 배포 주소
+
+[FinePrint 서비스 바로가기](https://fineprint-199065598070.asia-east1.run.app/)
+
+<details>
+<summary><strong>개발자용 개별 모듈 실행 방법</strong></summary>
+
+<br>
+
+#### Agent 통합 테스트
+
+```powershell
+python -m msh.test_agent
+```
+
+#### 약관 수집기 단독 실행
+
+```powershell
+python -m jhc.search_fineprint_v2 --service 넷플릭스
+```
+
+#### 공식 URL 직접 지정
+
+```powershell
+python -m jhc.search_fineprint_v2 --service 넷플릭스 `
+  --terms-url "https://help.netflix.com/ko/legal/termsofuse" `
+  --privacy-url "https://help.netflix.com/ko/legal/privacy"
+```
+
+</details>
+
 ---
-## 13. 팀원과 역할
-|구분|기능|
+## 13. 팀원 및 역할
+
+| 이름 | 담당 역할 |
 |---|---|
-|크롤링|ㄹㅇㄹㅇㄹㅇㄹㅇㄹㄹ|
-|ㅇㄹ|ㅇㄹㅇㄹㅇㄹ|
-|ㅇㄹㅇ|
-|ㅇㄹㅇㄹㅇㄹ||ㅇㄹㅇㄹㅇㄹ|
+| 안민재 | 공식 약관·정책 URL 탐색 |
+| 정현천 | 웹페이지 본문 추출·정제 및 수집 결과 연계 |
+| 박시영 | 문서 전처리·임베딩·지식베이스 구축 및 Hybrid RAG 검색 |
+| 문서현 | LangGraph Agent 흐름 설계 및 구현, 의도 분류·답변 생성·검증·재시도 구조 |
+| 문하현 | React UI 구현, 입력·결과·근거·분석 이력 화면 구성 |
+
 ---
-### 14. 시연 영상 및 발표 자료
+## 14. 시연 및 발표 자료
+
+- [FinePrint 서비스 바로가기](https://fineprint-199065598070.asia-east1.run.app/)
+- [시연 영상](시연_영상_URL)
+- [발표 자료 PDF](./docs/FinePrint_presentation.pdf)
